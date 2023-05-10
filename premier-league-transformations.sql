@@ -44,8 +44,33 @@ DECLARE @year INT = 2000;
 
 WHILE (@year < 2023)
 BEGIN
-  SET @query += 'SELECT [Div], [Date], [HomeTeam], [AwayTeam], [FTHG], [FTAG], [FTR], [HTHG], [HTAG], [HTR], [Referee], [HS], [AS], [HST], [AST], [HF], [AF], [HC], [AC], [HY], [AY], [HR], [AR], ''' + CAST(@year AS VARCHAR(4)) + '/' + CAST(@year + 1 AS VARCHAR(4)) + ''' AS Season 
-					FROM [premier-league-project].[dbo].[PremierLeagueData' + CAST(@year AS VARCHAR(4)) + CAST(@year + 1 AS VARCHAR(4)) + '] ';
+  SET @query += '
+  SELECT 
+	[Div], 
+	[Date], 
+	[HomeTeam], 
+	[AwayTeam], 
+	[FTHG], 
+	[FTAG], 
+	[FTR], 
+	[HTHG], 
+	[HTAG], 
+	[HTR], 
+	[Referee], 
+	[HS], 
+	[AS], 
+	[HST], 
+	[AST], 
+	[HF], 
+	[AF], 
+	[HC], 
+	[AC], 
+	[HY], 
+	[AY], 
+	[HR], 
+	[AR], 
+	''' + CAST(@year AS VARCHAR(4)) + '/' + CAST(@year + 1 AS VARCHAR(4)) + ''' AS Season 
+FROM [premier-league-project].[dbo].[PremierLeagueData' + CAST(@year AS VARCHAR(4)) + CAST(@year + 1 AS VARCHAR(4)) + '] ';
   SET @year = @year + 1;
   IF (@year < 2023)
   BEGIN
@@ -57,6 +82,7 @@ EXEC(@query);
 
 -- create lookup to add 'City' column to the data
 
+use [premier-league-project] 
 CREATE TABLE PremierLeagueTeamAndCity (
     team VARCHAR(50),
     city VARCHAR(50)
@@ -91,20 +117,46 @@ INSERT INTO PremierLeagueTeamAndCity (team, city) VALUES
 ('West Bromwich Albion', 'West Bromwich'),
 ('West Ham', 'London'),
 ('Wigan Athletic', 'Wigan'),
-('Wolves', 'Wolverhampton');
+('Wolves', 'Wolverhampton'),
+('Reading', 'Reading'),
+('Coventry', 'Coventry'),
+('Bradford', 'Bradford'),
+('Wigan', 'Wigan'),
+('Cardiff', 'Cardiff'),
+('Middlesbrough', 'Middlesbrough'),
+('Derby', 'Derby'),
+('Stoke', 'Stoke-on-Trent'),
+('Birmingham', 'Birmingham'),
+('Swansea', 'Swansea'),
+('Blackpool', 'Blackpool'),
+('Huddersfield', 'Huddersfield'),
+('Portsmouth', 'Portsmouth'),
+('Norwich', 'Norwich'),
+('West Brom', 'West Bromwich'),
+('Blackburn', 'Blackburn'),
+('Hull', 'Kingston upon Hull'),
+('Charlton', 'London'),
+('Ipswich', 'Ipswich'),
+('QPR', 'London'),
+('Bolton', 'Bolton');
 
 -- join cities onto data
 
-select firstjoin.*, c.city as AwayCity
+create view PremierLeagueDataWithCity as
+select 
+	firstjoin.*, 
+	c.city as AwayCity
 from
 (
 select 
-	a.*, b.city as HomeCity
+	a.*, 
+	b.city as HomeCity
 from [premier-league-project]..[PremierLeagueData] as a 
 left join [premier-league-project]..[PremierLeagueTeamAndCity] as b
 on a.HomeTeam = b.team
 ) as firstjoin
 left join [premier-league-project]..[PremierLeagueTeamAndCity] as c
 on firstjoin.AwayTeam = c.team
+
 
 
