@@ -91,7 +91,7 @@ from [premier-league-project]..[PremierLeagueDataWithCity]
 group by season
 order by season
 
--- 7
+-- 5
 -- Home and Away Yellow cards vs Red cards over all seasons >= '2000/2021'
 
 create view HomeAndAwayYellowVsRedAllSeasons as
@@ -107,7 +107,7 @@ select
 	(SUM(AY)/COUNT(date))*100 as AwayYellowCardRate
 from [premier-league-project]..[PremierLeagueDataWithCity]
 
--- 8
+-- 6
 -- Home and Away Yellow cards vs Red cards over all seasons >= '2000/2021'
 
 create view HomeAndAwayYellowVsRedBySeasons as
@@ -126,7 +126,7 @@ from [premier-league-project]..[PremierLeagueDataWithCity]
 group by season
 order by season
 
--- 9
+-- 7
 -- Yellow cards vs Red cards by seasons and Home team
 
 create view YellowVsRedBySeasonsAndHomeTeam as
@@ -139,7 +139,7 @@ from [premier-league-project]..[PremierLeagueDataWithCity]
 group by season, HomeTeam
 order by season, HomeTeam
 
--- 10
+-- 8
 -- Yellow cards vs Red cards by seasons and Away team
 
 create view YellowVsRedBySeasonsAndAwayTeam as
@@ -152,7 +152,7 @@ from [premier-league-project]..[PremierLeagueDataWithCity]
 group by season, AwayTeam
 order by season, AwayTeam
 
--- 11
+-- 9
 -- Total cards for each season and team 
 
 create view TotalCardsBySeasonAndTeam as
@@ -177,7 +177,7 @@ left join [premier-league-project]..[YellowVsRedBySeasonsAndAwayTeam] as c
 on a.season = c.season and a.Team = c.AwayTeam
 order by season, Team
 
--- 11
+-- 10
 -- Total cards for team over all seasons >= '2000/2021'
 
 create view TotalCardsByTeamAllSeasons as
