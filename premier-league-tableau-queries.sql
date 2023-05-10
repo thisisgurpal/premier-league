@@ -108,7 +108,7 @@ select
 from [premier-league-project]..[PremierLeagueDataWithCity]
 
 -- 6
--- Home and Away Yellow cards vs Red cards over all seasons >= '2000/2021'
+-- Home and Away Yellow cards vs Red cards by season
 
 create view HomeAndAwayYellowVsRedBySeasons as
 select 
@@ -178,7 +178,7 @@ on a.season = c.season and a.Team = c.AwayTeam
 order by season, Team
 
 -- 10
--- Total cards for team over all seasons >= '2000/2021'
+-- Total cards by team over all seasons >= '2000/2021'
 
 create view TotalCardsByTeamAllSeasons as
 select
