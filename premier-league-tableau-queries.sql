@@ -37,7 +37,24 @@ HR = Home Team Red Cards
 AR = Away Team Red Cards
 */
 
--- 1
+CREATE TABLE SeasonMonthOrder (
+  MonthNumber INT,
+  MonthName VARCHAR(20)
+);
+
+INSERT INTO SeasonMonthOrder (MonthNumber, MonthName)
+VALUES
+  (1, 'August'),
+  (2, 'September'),
+  (3, 'October'),
+  (4, 'November'),
+  (5, 'December'),
+  (6, 'January'),
+  (7, 'February'),
+  (8, 'March'),
+  (9, 'April'),
+  (10, 'May');
+
 -- Goals per season
 
 create view GoalsPerSeason as
@@ -50,21 +67,38 @@ from [premier-league-project]..[PremierLeagueDataWithCity]
 group by season
 order by season
 
--- 2
 -- Goals per season and date
 
-create view GoalsPerSeasonAndDate as
+create view GoalsPerSeasonAndOrderDate as
 select 
 	season, 
-	date,
+	SeasonOrderDate,
 	SUM(FTHG) as HomeGoals, 
 	SUM(FTAG) as AwayGoals,
 	SUM(FTHG + FTAG) as TotalGoals
+from 
+(
+select
+	*,
+	CASE
+           WHEN MONTH(date) = 1 THEN '01/01/9999'
+           WHEN MONTH(date) = 2 THEN '01/02/9999'
+           WHEN MONTH(date) = 3 THEN '01/03/9999'
+           WHEN MONTH(date) = 4 THEN '01/04/9999'
+           WHEN MONTH(date) = 5 THEN '01/05/9999'
+           WHEN MONTH(date) = 6 THEN '01/06/9999'
+           WHEN MONTH(date) = 7 THEN '01/07/9999'
+           WHEN MONTH(date) = 8 THEN '01/08/9999'
+           WHEN MONTH(date) = 9 THEN '01/09/9999'
+           WHEN MONTH(date) = 10 THEN '01/10/9999'
+           WHEN MONTH(date) = 11 THEN '01/11/9999'
+           WHEN MONTH(date) = 12 THEN '01/12/9999'
+       END AS SeasonOrderDate
 from [premier-league-project]..[PremierLeagueDataWithCity]
-group by season, date
-order by season, date
+) as SubQuery
+group by SeasonOrderDate
+order by SeasonOrderDate
 
--- 3
 -- Yellow cards vs Red cards over all seasons >= '2000/2021'
 
 create view YellowVsRedAllSeasons as
@@ -76,7 +110,6 @@ select
 	(SUM(HY + AY)/COUNT(date))*100 as YellowCardRate
 from [premier-league-project]..[PremierLeagueDataWithCity]
 
--- 4
 -- Yellow cards vs Red cards for each season
 
 create view YellowVsRedBySeasons as
@@ -91,10 +124,9 @@ from [premier-league-project]..[PremierLeagueDataWithCity]
 group by season
 order by season
 
--- 5
--- Home and Away Yellow cards vs Red cards over all seasons >= '2000/2021'
+-- card probailities over all seasons >= '2000/2021'
 
-create view HomeAndAwayYellowVsRedAllSeasons as
+create view CardRates as
 select 
 	SUM(HR) as HomeRedCards, 
 	SUM(AR) as AwayRedCards, 
@@ -103,11 +135,16 @@ select
 	COUNT(date) as TotalGames,
 	(SUM(HR)/COUNT(date))*100 as HomeRedCardRate,
 	(SUM(AR)/COUNT(date))*100 as AwayRedCardRate,
+	(SUM(AR)/COUNT(date))/(SUM(HR)/COUNT(date)) as IncreasedAwayRedCardProbability,
 	(SUM(HY)/COUNT(date))*100 as HomeYellowCardRate,
-	(SUM(AY)/COUNT(date))*100 as AwayYellowCardRate
+	(SUM(AY)/COUNT(date))*100 as AwayYellowCardRate,
+	(SUM(AY)/COUNT(date))/(SUM(HY)/COUNT(date)) as IncreasedAwayYellowCardProbability,
+	(SUM(AR)+SUM(AY))/COUNT(date)*100 as OverallAwayCardRate,
+	(SUM(HR)+SUM(HY))/COUNT(date)*100 as OverallHomeCardRate,
+	(SUM(HR)+SUM(HY)+SUM(AR)+SUM(AY))/COUNT(date)*100 as OverallCardRate,
+	((SUM(AR)+SUM(AY))/COUNT(date))/((SUM(HR)+SUM(HY))/COUNT(date)) as IncreasedAwayCardProbability
 from [premier-league-project]..[PremierLeagueDataWithCity]
 
--- 6
 -- Home and Away Yellow cards vs Red cards by season
 
 create view HomeAndAwayYellowVsRedBySeasons as
@@ -126,7 +163,6 @@ from [premier-league-project]..[PremierLeagueDataWithCity]
 group by season
 order by season
 
--- 7
 -- Yellow cards vs Red cards by seasons and Home team
 
 create view YellowVsRedBySeasonsAndHomeTeam as
@@ -139,7 +175,6 @@ from [premier-league-project]..[PremierLeagueDataWithCity]
 group by season, HomeTeam
 order by season, HomeTeam
 
--- 8
 -- Yellow cards vs Red cards by seasons and Away team
 
 create view YellowVsRedBySeasonsAndAwayTeam as
@@ -152,7 +187,6 @@ from [premier-league-project]..[PremierLeagueDataWithCity]
 group by season, AwayTeam
 order by season, AwayTeam
 
--- 9
 -- Total cards for each season and team 
 
 create view TotalCardsBySeasonAndTeam as
@@ -177,7 +211,6 @@ left join [premier-league-project]..[YellowVsRedBySeasonsAndAwayTeam] as c
 on a.season = c.season and a.Team = c.AwayTeam
 order by season, Team
 
--- 10
 -- Total cards by team over all seasons >= '2000/2021'
 
 create view TotalCardsByTeamAllSeasons as
