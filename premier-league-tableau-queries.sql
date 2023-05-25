@@ -115,14 +115,18 @@ from [premier-league-project]..[PremierLeagueDataWithCity]
 create view YellowVsRedBySeasons as
 select 
 	season, 
-	SUM(HR + AR) as RedCards, 
-	SUM(HY + AY) as YellowCards,
+	SUM(HR) + SUM(AR) as RedCards, 
+	SUM(HY) + SUM(AY) as YellowCards,
 	COUNT(date) as TotalGames,
 	(SUM(HR + AR)/COUNT(date))*100 as RedCardRate,
 	(SUM(HY + AY)/COUNT(date))*100 as YellowCardRate
-from [premier-league-project]..[PremierLeagueDataWithCity]
+from [premier-league-project]..PremierLeagueData
 group by season
 order by season
+
+select 
+	HR, AR
+from [premier-league-project]..PremierLeagueData20222023
 
 -- card probailities over all seasons >= '2000/2021'
 
